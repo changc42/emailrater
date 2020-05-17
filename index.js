@@ -1,12 +1,10 @@
 const express = require("express");
 
-const setupCookie = require("./middleware/cookie");
-let setupRoutes = require("./routes");
+const setupMW = require("./middleware");
 
 let app = express();
 
-setupCookie(app);
-setupRoutes(app);
+setupMW(app);
 
 let PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

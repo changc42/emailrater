@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ResultCard from "./ResultCard";
+// import ResultCard from "./ResultCard";
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import Landing from "./Landing";
 import Query from "./Query";
@@ -8,16 +8,15 @@ function App() {
   let [isLoading, setIsLoading] = useState(true);
   let [myMessageList, setMyMessageList] = useState([]);
 
-  useEffect(() => {
-    fetch("sendResults")
-      .then((res) => res.json())
-      .then((data) => {
-        setMyMessageList(data.myMessageList);
-        setIsLoading(false);
-        console.log(myMessageList, "Test");
-      });
-  }, [isLoading]);
-
+  // useEffect(() => {
+  //   fetch("sendResults")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       setMyMessageList(data.myMessageList);
+  //       setIsLoading(false);
+  //       console.log(myMessageList, "Test");
+  //     });
+  // }, [isLoading]);
   return (
     <BrowserRouter>
       <Switch>

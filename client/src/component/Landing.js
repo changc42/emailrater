@@ -4,11 +4,11 @@ import Button from "@material-ui/core/Button";
 
 export default function Landing() {
   let [msg, setMsg] = useState("");
-  useEffect(() => {
-    fetch("api/auth")
-      .then((res) => res.json())
-      .then((data) => console.log(data));
-  });
+  // useEffect(() => {
+  //   fetch("api/auth")
+  //     .then((res) => res.json())
+  //     .then((data) => console.log(data));
+  // });
   return (
     <div>
       <Typography variant="h1">Email Rater</Typography>
