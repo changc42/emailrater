@@ -45,7 +45,11 @@ module.exports = (req, res, db) => {
       //   }
       // );
 
-      db.accessToken = authObj.access_token;
+      let cookieId = req.headers.cookie;
+      db[cookieId] = {
+        accessToken: authObj.access_token,
+        myMessageList: [],
+      };
       res.redirect("/query");
     });
   });

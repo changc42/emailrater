@@ -5,8 +5,8 @@ const https = require("https");
 const url = require("url");
 const fs = require("fs");
 
-const endpoints = require("../../auth/endpoints");
-const { API_KEY } = require("../../auth/keys");
+const endpoints = require("../../../config/endpoints");
+const { API_KEY } = require("../../../config/keys");
 
 module.exports = (req, res, db) => {
   getMessageList(req, res, db);
@@ -14,11 +14,10 @@ module.exports = (req, res, db) => {
 
 function getMessageList(req, res, db) {
   let urlObj = url.parse(req.url, true).query;
-  console.log(db, "part 2");
   let { maxResults, from, to, after, before } = urlObj;
 
   let query = {
-    access_token: db.accessToken,
+    access_token: db[req.headers.cookie].accessToken,
     maxResults,
   };
   qParam = "";
@@ -28,9 +27,8 @@ function getMessageList(req, res, db) {
   if (before != "") qParam += `before:${before} `;
   query.q = qParam;
   let queryString = new URLSearchParams(query).toString();
-  console.log(query);
 
-  console.log(db.accessToken);
+  console.log(db[req.headers.cookie].accessToken);
 
   let gmailReq = https.request(
     `${endpoints.gmail_messages}?${queryString}`,
@@ -52,36 +50,31 @@ function getMessageList(req, res, db) {
 function messageListToMyMessageList(req, res, db, messageList) {
   if (messageList.messages) {
     messageList.messages.forEach(({ id }) => {
-      if (!db.myMessageListCache.map((e) => e.id).includes(id)) {
-        console.log(`retrieving content of id: ${id}`);
-        let query = {
-          access_token: db.accessToken,
-        };
-        let queryString = new URLSearchParams(query).toString();
-        let messageIdContentReq = https.request(
-          `${endpoints.gmail_messages}/${id}?${queryString}`,
-          (messageIdContentRes) => {
-            let sb = "";
-            messageIdContentRes.on("data", (chunk) => {
-              sb += chunk.toString();
-            });
-            messageIdContentRes.on("end", () => {
-              let messageObj = JSON.parse(sb);
-              db.myMessageList.push(reduceMsg(messageObj));
-              if (db.myMessageList.length === messageList.messages.length) {
-                assessMessages(req, res, db);
-              }
-            });
-          }
-        );
-        messageIdContentReq.end();
-      } else {
-        console.log(`message id ${id} already in db`);
-        db.myMessageList.push(db.myMessageListCache.find((e) => e.id === id));
-        if (db.myMessageList.length === messageList.messages.length) {
-          assessMessages(req, res, db);
+      console.log(`retrieving content of id: ${id}`);
+      let query = {
+        access_token: db[req.headers.cookie].accessToken,
+      };
+      let queryString = new URLSearchParams(query).toString();
+      let messageIdContentReq = https.request(
+        `${endpoints.gmail_messages}/${id}?${queryString}`,
+        (messageIdContentRes) => {
+          let sb = "";
+          messageIdContentRes.on("data", (chunk) => {
+            sb += chunk.toString();
+          });
+          messageIdContentRes.on("end", () => {
+            let messageObj = JSON.parse(sb);
+            db[req.headers.cookie].myMessageList.push(reduceMsg(messageObj));
+            if (
+              db[req.headers.cookie].myMessageList.length ===
+              messageList.messages.length
+            ) {
+              assessMessages(req, res, db);
+            }
+          });
         }
-      }
+      );
+      messageIdContentReq.end();
     });
   } else {
     res.end("no messages found");
@@ -127,7 +120,7 @@ function base64Decode(s) {
 
 function assessMessages(req, res, db) {
   let count = 0;
-  db.myMessageList.forEach((msg) => {
+  db[req.headers.cookie].myMessageList.forEach((msg) => {
     let query = {
       key: API_KEY,
     };
@@ -145,10 +138,9 @@ function assessMessages(req, res, db) {
       nlpRes.on("end", () => {
         msg.sentAnalysis = JSON.parse(sb);
         count++;
-        console.log(`${count}/${db.myMessageList.length}`);
-        if (count === db.myMessageList.length) {
-          let htmlFile = fs.createReadStream("client/build/index.html");
-          htmlFile.pipe(res);
+        console.log(`${count}/${db[req.headers.cookie].myMessageList.length}`);
+        if (count === db[req.headers.cookie].myMessageList.length) {
+          res.redirect("/results");
         }
       });
     });
