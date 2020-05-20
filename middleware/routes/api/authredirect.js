@@ -18,7 +18,7 @@ module.exports = (req, res, db) => {
     client_secret: client_secret,
     code: authCode,
     grant_type: "authorization_code",
-    new_redirect_uri: redirect_uri,
+    redirect_uri: new_redirect_uri,
   };
   let queryString = new URLSearchParams(query).toString();
   const options = {
