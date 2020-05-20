@@ -7,15 +7,12 @@ const sendResults = require("./api/sendResults");
 const express = require("express");
 const url = require("url");
 
-let db = {
-  accessToken: null,
-  myMessageList: [],
-  myMessageListCache: [],
-};
-
-module.exports = (app) => {
+module.exports = (app, db) => {
+  // app.use((req, res, next) => {
+  //   console.log("\n past cookie middleware", req.url);
+  //   next();
+  // });
   app.get("/api/auth", (req, res) => {
-    console.log("molaka", url.parse(req.headers.referer));
     apiAuth(req, res, db);
   });
 
@@ -31,7 +28,11 @@ module.exports = (app) => {
     sendResults(req, res, db);
   });
 
-  app.use(express.static("client/build"));
+  app.get("/api/dummy", (req, res) => {
+    res.end("at dummy bbbb");
+  });
+
+  app.use(express.static(path.resolve(__dirname, "../../client/build")));
 
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../../client/build/index.html"));

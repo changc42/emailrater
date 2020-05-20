@@ -1,25 +1,14 @@
 import React, { useState, useEffect } from "react";
-import ResultCard from "./ResultCard/ResultCard";
+
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import Landing from "./Landing";
 import Query from "./Query";
+import Unauthorized from "./Unauthorized/Unauthorized";
+import Results from "./Results/Results";
 
 function App() {
-  let [isLoading, setIsLoading] = useState(true);
-  let [myMessageList, setMyMessageList] = useState([]);
-
-  useEffect(() => {
-    fetch("/api/sendResults")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setMyMessageList(data.myMessageList);
-        setIsLoading(false);
-        console.log(myMessageList, "Test");
-      });
-  }, [isLoading]);
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Switch>
         <Route exact path="/">
           <Landing />
@@ -28,16 +17,10 @@ function App() {
           <Query />
         </Route>
         <Route exact path="/results">
-          {isLoading ? (
-            <p>loading your messages</p>
-          ) : (
-            <div className="App">
-              <h1>Results:</h1>
-              {myMessageList.map((msg) => {
-                return <ResultCard message={msg} />;
-              })}
-            </div>
-          )}
+          <Results />
+        </Route>
+        <Route exact path="/unauthorized">
+          <Unauthorized />
         </Route>
       </Switch>
     </BrowserRouter>

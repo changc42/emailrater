@@ -10,7 +10,9 @@ import styling from "./resultCardStyling";
 function ResultCard(props) {
   let { content, sentAnalysis } = props.message;
   let from = props.message.headers.filter((e) => e.name === "From")[0].value;
-  let to = props.message.headers.filter((e) => e.name === "To")[0].value;
+  let to = props.message.headers.filter((e) => e.name === "To")[0]
+    ? props.message.headers.filter((e) => e.name === "To")[0].value
+    : "";
   let date = props.message.headers.filter((e) => e.name === "Date")[0].value;
   let subject = props.message.headers.filter((e) => e.name === "Subject")[0]
     .value;

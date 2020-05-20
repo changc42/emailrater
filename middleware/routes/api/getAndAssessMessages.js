@@ -140,7 +140,7 @@ function assessMessages(req, res, db) {
         count++;
         console.log(`${count}/${db[req.headers.cookie].myMessageList.length}`);
         if (count === db[req.headers.cookie].myMessageList.length) {
-          res.redirect("/results");
+          res.redirect(req.baseUrl + "/results");
         }
       });
     });

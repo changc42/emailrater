@@ -11,7 +11,7 @@ export default function Query() {
   }
   return (
     <div>
-      <form action="/api/getAndAssessMessages">
+      <form action="api/getAndAssessMessages">
         <label for="maxResults">Max Results</label>
         <input
           type="number"

@@ -1,10 +1,10 @@
 const express = require("express");
 
-const setupMW = require("./middleware");
+const appRouter = require("./middleware");
 
 let app = express();
 
-setupMW(app);
+app.use(appRouter);
 
 let PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
